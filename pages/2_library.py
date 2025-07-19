@@ -31,6 +31,7 @@ def switch_read(was_read, article_id):
 def delete_article(article_id):
     try:
         sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection.execute("PRAGMA foreign_keys=ON;")
         cursor = sqliteConnection.cursor()
         cursor.execute("""
             DELETE FROM Articles
@@ -42,6 +43,7 @@ def delete_article(article_id):
         return True
 
     except sqlite3.Error as error:
+        print('Error occurred -', error)
         return False
     
     finally:
@@ -52,21 +54,26 @@ try:
     sqliteConnection = sqlite3.connect('./database/articles.db')
 
     df = pd.read_sql_query("""
-        SELECT article_id,
-            title, 
+        SELECT 
+            a.article_id,
+            a.title, 
             CASE
-                WHEN was_read = 0 THEN "False"
+                WHEN a.was_read = 0 THEN "False"
                 ELSE "True"
             END as was_read,
-            date_added, 
-            link
-        FROM Articles
+            a.date_added, 
+            a.link,
+            GROUP_CONCAT(c.category_name, ', ') AS categories
+        FROM Articles a
+        INNER JOIN ArticleCategories ac ON a.article_id = ac.article_id
+        INNER JOIN Categories c ON ac.category_id = c.category_id
+        GROUP BY a.article_id, a.title, a.was_read, a.date_added, a.link
     """, sqliteConnection)
 
     for index, row in df.iterrows():
         page = wikipedia.WikipediaPage(title=row.title)
 
-        with st.container(height=246, border=True):
+        with st.container(height=290, border=True):
             title, link = st.columns([5.9, 1], vertical_alignment="center")
             title.markdown(f"**{row.title}**")
             link.link_button("Visit 🔗", row.link)
@@ -74,6 +81,8 @@ try:
                 st.write(page.summary[:max_summary_length - 3] + "...")
             else:
                 st.write(page.summary)
+
+            st.markdown(f":blue-background[*{row.categories}*]")
 
             readbadge, empty, options = st.columns([1, 6, 1], vertical_alignment="center")
             more_options = options.popover("...")

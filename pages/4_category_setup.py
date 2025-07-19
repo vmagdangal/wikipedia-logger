@@ -53,6 +53,7 @@ def add_category(title):
 def delete_category(category_id):
     try:
         sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection.execute("PRAGMA foreign_keys=ON;")
         cursor = sqliteConnection.cursor()
         cursor.execute("""
             DELETE FROM Categories

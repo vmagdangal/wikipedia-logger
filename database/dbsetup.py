@@ -33,8 +33,8 @@ try:
         article_id INTEGER,
         category_id INTEGER,
         PRIMARY KEY (article_id, category_id),
-        FOREIGN KEY(article_id) REFERENCES Articles(article_id),
-        FOREIGN KEY(category_id) REFERENCES Categories(category_id)
+        FOREIGN KEY(article_id) REFERENCES Articles(article_id) ON DELETE CASCADE,
+        FOREIGN KEY(category_id) REFERENCES Categories(category_id) ON DELETE CASCADE
     );
     """,
     """

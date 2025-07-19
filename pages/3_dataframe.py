@@ -9,18 +9,30 @@ try:
     sqliteConnection = sqlite3.connect('./database/articles.db')
 
     df = pd.read_sql_query("""
-        SELECT article_id,
-            title, 
+        SELECT 
+            a.article_id,
+            a.title, 
+            GROUP_CONCAT(c.category_name, ', ') AS categories,
+            a.date_added,
             CASE
-                WHEN was_read = 0 THEN "False"
+                WHEN a.was_read = 0 THEN "False"
                 ELSE "True"
             END as was_read,
-            date_added, 
-            link
-        FROM Articles
+            a.link
+        FROM Articles a
+        INNER JOIN ArticleCategories ac ON a.article_id = ac.article_id
+        INNER JOIN Categories c ON ac.category_id = c.category_id
+        GROUP BY a.article_id, a.title, a.was_read, a.date_added, a.link
     """, sqliteConnection)
 
     st.write(df.iloc[:, 1:])
+
+    df_junction = pd.read_sql_query("""
+        SELECT article_id, category_id
+        FROM ArticleCategories
+    """, sqliteConnection)
+
+    st.write(df_junction)
 
 except sqlite3.Error as error:
     print('Error occurred -', error)
