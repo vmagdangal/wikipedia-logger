@@ -76,7 +76,7 @@ try:
         with st.container(height=290, border=True):
             title, link = st.columns([5.9, 1], vertical_alignment="center")
             title.markdown(f"**{row.title}**")
-            link.link_button("Visit 🔗", row.link)
+            link.link_button("Visit 🔗", f"https://{row.link}")
             if(len(page.summary) > max_summary_length):
                 st.write(page.summary[:max_summary_length - 3] + "...")
             else:
@@ -84,15 +84,16 @@ try:
 
             st.markdown(f":blue-background[*{row.categories}*]")
 
-            readbadge, empty, options = st.columns([1, 6, 1], vertical_alignment="center")
+            date_badge, read_badge, empty, options = st.columns([1.1, 1, 4, 1], vertical_alignment="center")
+            date_badge.badge(row.date_added, icon=":material/calendar_today:", color="blue")
             more_options = options.popover("...")
-
+            
             if(row.was_read == "True"):
-                readbadge.badge("Read", icon=":material/check:", color="green")
+                read_badge.badge("Read", icon=":material/check:", color="green")
                 if more_options.button("Mark as Want to Read", icon="⌛️", use_container_width=True, key=f"wantread_{row.article_id}"):
                     switch_read(0, row.article_id)
             else:
-                readbadge.badge("Unread", icon=":material/close:", color="orange")
+                read_badge.badge("Unread", icon=":material/close:", color="orange")
                 if more_options.button("Mark as Read", icon="✅", use_container_width=True, key=f"read_{row.article_id}"):
                     switch_read(1, row.article_id)
             if more_options.button("Delete from Library", icon="🗑️", use_container_width=True, key=f"delete_{row.article_id}"):

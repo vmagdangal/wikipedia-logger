@@ -88,6 +88,7 @@ try:
     df = pd.read_sql_query("""
         SELECT *
         FROM Categories
+        ORDER BY category_name
     """, sqliteConnection)
 
     st.divider()

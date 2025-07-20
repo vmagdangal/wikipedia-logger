@@ -7,9 +7,7 @@ try:
     print('Resetting Database')
 
     drop_queries = [
-        "DROP TABLE IF EXISTS ArticleFolders;",
         "DROP TABLE IF EXISTS ArticleCategories;",
-        "DROP TABLE IF EXISTS Folders;",
         "DROP TABLE IF EXISTS Categories;",
         "DROP TABLE IF EXISTS Articles;"
     ]
@@ -22,7 +20,7 @@ try:
         article_id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT UNIQUE,
         link TEXT UNIQUE,
-        date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        date_added DATE DEFAULT CURRENT_DATE,
         was_read BOOLEAN DEFAULT 0
     );
     """,
@@ -33,28 +31,12 @@ try:
     );
     """,
     """
-    CREATE TABLE IF NOT EXISTS Folders (
-        folder_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        folder_name TEXT UNIQUE,
-        creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """,
-    """
     CREATE TABLE IF NOT EXISTS ArticleCategories (
         article_id INTEGER,
         category_id INTEGER,
         PRIMARY KEY (article_id, category_id),
         FOREIGN KEY(article_id) REFERENCES Articles(article_id) ON DELETE CASCADE,
         FOREIGN KEY(category_id) REFERENCES Categories(category_id) ON DELETE CASCADE
-    );
-    """,
-    """
-    CREATE TABLE IF NOT EXISTS ArticleFolders (
-        article_id INTEGER,
-        folder_id INTEGER,
-        PRIMARY KEY (article_id, folder_id),
-        FOREIGN KEY(article_id) REFERENCES Articles(article_id),
-        FOREIGN KEY(folder_id) REFERENCES Folders(folder_id)
     );
     """]
 

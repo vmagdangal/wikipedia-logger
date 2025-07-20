@@ -3,17 +3,18 @@ import sqlite3
 import sys
 import wikipedia # type: ignore
 import pandas as pd # type: ignore
-from datetime import datetime
+import datetime
 
 sys.stdout.reconfigure(encoding='utf-8')
 st.set_page_config(page_title="Wikipedia Logger", page_icon="📊")
 
 class Article:
-  def __init__(self, title, lang, data, link):
+  def __init__(self, title, lang, data, link, date_read):
     self.title = title
     self.lang = lang
     self.data = data
     self.link = link
+    self.date_read = date_read
 
 class Category:
   def __init__(self, category_id, category_name):
@@ -38,7 +39,7 @@ def grab_article(url):
     wikipedia.set_lang(pageLang)
     try:
         page = wikipedia.WikipediaPage(title=pageTitle)
-        return Article(pageTitle, pageLang, page, url)
+        return Article(pageTitle, pageLang, page, url, datetime.date.today())
     except Exception as e:
         print(f"Error fetching page '{pageTitle}': {e}")
         return None
@@ -51,6 +52,7 @@ def grab_categories():
         df = pd.read_sql_query("""
             SELECT *
             FROM Categories
+            ORDER BY category_name
         """, sqliteConnection)
         
         for _,row in df.iterrows():
@@ -78,7 +80,7 @@ def add_article(button, wasRead: bool, article: Article, categories):
                 link = excluded.link,
                 date_added = excluded.date_added,
                 was_read = excluded.was_read;
-        """, (article.title, article.link, datetime.now().astimezone().date().isoformat(), wasRead))
+        """, (article.title, article.link, article.date_read, wasRead))
 
         cursor.execute("SELECT article_id FROM Articles WHERE title = ?", (article.title,))
         article_id = cursor.fetchone()[0]
@@ -118,9 +120,11 @@ else:
     page = grab_article(wiki_url)
 
     if isinstance(page, Article) and categories:
+        category_input, date_input = st.columns([3, 1])
         category_map = {c.category_name: c for c in categories}
-        selected_categories = st.multiselect("Select Categories", list(category_map.keys()), accept_new_options=False,)
+        selected_categories = category_input.multiselect("Select Categories", list(category_map.keys()), accept_new_options=False,)
         selected_objects = [category_map[name] for name in selected_categories]
+        page.date_read = date_input.date_input("Date Read", datetime.date.today())
 
         left, right = st.columns(2)
         if left.button("Add to Read", icon="✅", use_container_width=True):

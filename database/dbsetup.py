@@ -22,28 +22,12 @@ try:
     );
     """,
     """
-    CREATE TABLE IF NOT EXISTS Folders (
-        folder_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        folder_name TEXT UNIQUE,
-        creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """,
-    """
     CREATE TABLE IF NOT EXISTS ArticleCategories (
         article_id INTEGER,
         category_id INTEGER,
         PRIMARY KEY (article_id, category_id),
         FOREIGN KEY(article_id) REFERENCES Articles(article_id) ON DELETE CASCADE,
         FOREIGN KEY(category_id) REFERENCES Categories(category_id) ON DELETE CASCADE
-    );
-    """,
-    """
-    CREATE TABLE IF NOT EXISTS ArticleFolders (
-        article_id INTEGER,
-        folder_id INTEGER,
-        PRIMARY KEY (article_id, folder_id),
-        FOREIGN KEY(article_id) REFERENCES Articles(article_id),
-        FOREIGN KEY(folder_id) REFERENCES Folders(folder_id)
     );
     """]
 
