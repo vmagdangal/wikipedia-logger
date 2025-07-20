@@ -59,6 +59,14 @@ def delete_category(category_id):
             DELETE FROM Categories
             WHERE category_id = ?
         """, (category_id,))
+        cursor.execute("""
+            DELETE FROM Articles
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM ArticleCategories ac
+                WHERE Articles.article_id = ac.article_id
+            );
+        """)
         sqliteConnection.commit()
         cursor.close()
         st.rerun()
