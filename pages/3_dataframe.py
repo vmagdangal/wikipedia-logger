@@ -3,12 +3,12 @@ import sqlite3
 import pandas as pd # type: ignore
 
 st.set_page_config(page_title="Article Library", page_icon="📊")
-st.markdown(f"**Dataframe**")
+st.markdown(f"**Dataframes**")
 
 try:
     sqliteConnection = sqlite3.connect('./database/articles.db')
 
-    df = pd.read_sql_query("""
+    df_article_combo = pd.read_sql_query("""
         SELECT 
             a.article_id,
             a.title, 
@@ -25,13 +25,31 @@ try:
         GROUP BY a.article_id, a.title, a.was_read, a.date_added, a.link
     """, sqliteConnection)
 
-    st.write(df.iloc[:, 1:])
+    st.write("Combined Data")
+    st.write(df_article_combo)
+
+    df_articles = pd.read_sql_query("""
+        SELECT *
+        FROM Articles
+    """, sqliteConnection)
+
+    st.write("Articles")
+    st.write(df_articles)
+
+    df_categories = pd.read_sql_query("""
+        SELECT *
+        FROM Categories
+    """, sqliteConnection)
+
+    st.write("Categories")
+    st.write(df_categories)
 
     df_junction = pd.read_sql_query("""
         SELECT article_id, category_id
         FROM ArticleCategories
     """, sqliteConnection)
 
+    st.write("ArticleCategories")
     st.write(df_junction)
 
 except sqlite3.Error as error:
