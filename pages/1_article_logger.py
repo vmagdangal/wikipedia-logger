@@ -41,7 +41,6 @@ def grab_article(url):
         page = wikipedia.WikipediaPage(title=pageTitle)
         return Article(pageTitle, pageLang, page, url, datetime.date.today())
     except Exception as e:
-        print(f"Error fetching page '{pageTitle}': {e}")
         return None
 
 def grab_categories():

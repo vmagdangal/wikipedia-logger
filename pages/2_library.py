@@ -76,7 +76,7 @@ try:
         with st.container(height=290, border=True):
             title, link = st.columns([5.9, 1], vertical_alignment="center")
             title.markdown(f"**{row.title}**")
-            link.link_button("Visit 🔗", f"https://{row.link}")
+            link.link_button("Visit 🔗", row.link)
             if(len(page.summary) > max_summary_length):
                 st.write(page.summary[:max_summary_length - 3] + "...")
             else:
