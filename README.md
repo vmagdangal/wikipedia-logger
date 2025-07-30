@@ -10,9 +10,12 @@ This is a work-in-progress GUI that can track and analyze your reading habits!
 ## Tech Stack
 Languages: 
 - Python
+
 Frameworks: 
 - Streamlit ([Docs](https://docs.streamlit.io/))
+
 Libraries & APIs:
 - pandas ([Docs](https://pandas.pydata.org/docs/))
 - Wikipedia ([Docs](https://wikipedia.readthedocs.io/en/latest/))
 - SQLite3 ([Docs](https://docs.python.org/3/library/sqlite3.html))
+- Altair ([Docs](https://altair-viz.github.io/index.html))
