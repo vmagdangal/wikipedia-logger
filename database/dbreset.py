@@ -9,7 +9,8 @@ try:
     drop_queries = [
         "DROP TABLE IF EXISTS ArticleCategories;",
         "DROP TABLE IF EXISTS Categories;",
-        "DROP TABLE IF EXISTS Articles;"
+        "DROP TABLE IF EXISTS Articles;",
+        "DROP TABLE IF EXISTS Reviews;"
     ]
 
     for query in drop_queries:
@@ -37,6 +38,15 @@ try:
         PRIMARY KEY (article_id, category_id),
         FOREIGN KEY(article_id) REFERENCES Articles(article_id) ON DELETE CASCADE,
         FOREIGN KEY(category_id) REFERENCES Categories(category_id) ON DELETE CASCADE
+    );
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS Reviews (
+        review_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        article_id INTEGER,
+        interest_rating INTEGER,
+        quality_rating INTEGER,
+        FOREIGN KEY(article_id) REFERENCES Articles(article_id) ON DELETE CASCADE
     );
     """]
 
