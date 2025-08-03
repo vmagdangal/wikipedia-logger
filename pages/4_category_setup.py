@@ -81,15 +81,42 @@ def delete_category(category_id):
         if sqliteConnection:
             sqliteConnection.close()
 
-st.title("Category Setup")
+def rename_category(category_id, new_name):
+    try:
+        sqliteConnection = sqlite3.connect(DB_PATH)
+        cursor = sqliteConnection.cursor()
 
-category_name = st.text_input("Add New Category").strip()
+        cursor.execute("""
+            UPDATE Categories
+            SET category_name = ?
+            WHERE category_id = ?
+        """, (new_name, category_id))
+
+
+        sqliteConnection.commit()
+        st.rerun()
+        cursor.close()
+        return True
+
+    except sqlite3.Error as error:
+        print('Error occurred -', error)
+        return False
+
+    finally:
+        if sqliteConnection:
+            sqliteConnection.close()
+
+st.title("Category Setup")
+category_name = st.text_input(f"Add New Category (50 character maximum)").strip()
 if category_name:
     if st.button("Add Category", icon="✅", use_container_width=True):
-        if add_category(category_name):
-            st.success(f"Successfully added \"{category_name}\"", icon="✅")
+        if(len(category_name) > 50):
+            st.error(f"Could not add. Category name is over 50 characters.", icon="⚠️")
         else:
-            st.error(f"Could not add \"{category_name}\". Category already exists.", icon="⚠️")
+            if add_category(category_name):
+                st.success(f"Successfully added \"{category_name}\"", icon="✅")
+            else:
+                st.error(f"Could not add \"{category_name}\". Category already exists.", icon="⚠️")
 
 try:
     sqliteConnection = sqlite3.connect(DB_PATH)
@@ -110,8 +137,11 @@ try:
             for index, row in df.iterrows():
                 if(index != 0):
                     st.divider()
-                title, delete = st.columns([6, 2], vertical_alignment="center")
-                title.markdown(f"**{row.category_name}**")
+                title, rename_box, rename_confirm, delete = st.columns([2,1,1,1], vertical_alignment="bottom")
+                title.subheader(f"**{row.category_name}**")
+                category_rename = rename_box.text_input("Rename Category (50 char)", key=f"rename_{row.category_id}").strip()
+                if rename_confirm.button("Rename", icon="🔄", key=f"rename_confirm_{row.category_id}", disabled=len(category_rename) > 50):
+                    rename_category(row.category_id, category_rename)
                 if delete.button("Delete Category", icon="🗑️", key=f"delete_{row.category_id}"):
                     delete_category(row.category_id)
 
