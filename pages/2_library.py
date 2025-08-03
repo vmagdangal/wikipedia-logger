@@ -20,7 +20,7 @@ class Category:
 
 def update_review(article_id, new_interest, new_quality):
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
         cursor = sqliteConnection.cursor()
         cursor.execute("""
             UPDATE Reviews
@@ -41,7 +41,7 @@ def update_review(article_id, new_interest, new_quality):
 
 def switch_read(was_read, article_id):
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
         cursor = sqliteConnection.cursor()
         cursor.execute("""
             UPDATE Reviews
@@ -213,13 +213,15 @@ with st.expander("Sort & Filter", icon=":material/sort:"):
 
     SORT_COLUMNS = {
         "Title": "title",
-        "Date": "date_added"
+        "Date": "date_added",
+        "Interest": "interest_rating",
+        "Quality": "quality_rating"
     }
     
     sort_options, sort_dir_options, sort_confirm = st.columns(WIDTH_SORT, vertical_alignment="bottom")
     sort_selection = sort_options.selectbox(
         "Sort By",
-        ("Title", "Date"),
+        ("Title", "Date", "Interest", "Quality"),
     )
     sort_direction = sort_dir_options.radio(
         "Order",
