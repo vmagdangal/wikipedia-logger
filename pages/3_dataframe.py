@@ -55,6 +55,14 @@ try:
     st.write("ArticleCategories")
     st.write(df_junction)
 
+    df_reviews = pd.read_sql_query("""
+        SELECT *
+        FROM Reviews
+    """, sqliteConnection)
+
+    st.write("Reviews")
+    st.write(df_reviews)
+
 except sqlite3.Error as error:
     print('Error occurred -', error)
 
