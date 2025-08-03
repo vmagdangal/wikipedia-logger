@@ -11,7 +11,7 @@ try:
         article_id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT UNIQUE,
         link TEXT UNIQUE,
-        date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        date_added DATE DEFAULT CURRENT_DATE,
         was_read BOOLEAN DEFAULT 0
     );
     """,
@@ -28,6 +28,15 @@ try:
         PRIMARY KEY (article_id, category_id),
         FOREIGN KEY(article_id) REFERENCES Articles(article_id) ON DELETE CASCADE,
         FOREIGN KEY(category_id) REFERENCES Categories(category_id) ON DELETE CASCADE
+    );
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS Reviews (
+        review_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        article_id INTEGER,
+        interest_rating INTEGER,
+        quality_rating INTEGER,
+        FOREIGN KEY(article_id) REFERENCES Articles(article_id) ON DELETE CASCADE
     );
     """]
 
