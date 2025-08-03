@@ -4,17 +4,20 @@ import sys
 import wikipedia # type: ignore
 import pandas as pd # type: ignore
 import datetime
+from streamlit_star_rating import st_star_rating # type: ignore
 
 sys.stdout.reconfigure(encoding='utf-8')
 st.set_page_config(page_title="Wikipedia Logger", page_icon="📊")
 
 class Article:
-  def __init__(self, title, lang, data, link, date_read):
+  def __init__(self, title, lang, data, link, date_read, interest_rating, quality_rating):
     self.title = title
     self.lang = lang
     self.data = data
     self.link = link
     self.date_read = date_read
+    self.interest_rating = interest_rating
+    self.quality_rating = quality_rating
 
 class Category:
   def __init__(self, category_id, category_name):
@@ -39,7 +42,7 @@ def grab_article(url):
     wikipedia.set_lang(pageLang)
     try:
         page = wikipedia.WikipediaPage(title=pageTitle)
-        return Article(pageTitle, pageLang, page, url, datetime.date.today())
+        return Article(pageTitle, pageLang, page, url, datetime.date.today(), None, None)
     except Exception as e:
         return None
 
@@ -92,14 +95,20 @@ def add_article(button, wasRead: bool, article: Article, categories):
                 VALUES(?, ?)
             """, (article_id, category.category_id))
 
+        cursor.execute("DELETE FROM Reviews WHERE article_id = ?", (article_id,))
+        cursor.execute("""
+            INSERT OR IGNORE INTO Reviews(article_id, interest_rating, quality_rating)
+            VALUES(?, ?, ?)
+        """, (article_id, article.interest_rating, article.quality_rating))
+
         print('Article added')
         sqliteConnection.commit()
         cursor.close()
 
         if(wasRead):
-            button.markdown("Article added to read list.")
+            st.success("Article added to read list.", icon="✅")
         else:
-            button.markdown("Article added to want-to-read list.")
+            st.success("Article added to want-to-read list.", icon="✅")
 
     except sqlite3.Error as error:
         print('Error occurred -', error)
@@ -119,6 +128,12 @@ else:
     page = grab_article(wiki_url)
 
     if isinstance(page, Article) and categories:
+        interest_select, quality_select = st.columns(2)
+        with interest_select:
+            page.interest_rating = st_star_rating("Interest", maxValue=5, defaultValue=3, key="interest", emoticons="true")
+        with quality_select:
+            page.quality_rating = st_star_rating("Quality", maxValue=5, defaultValue=3, key="quality")
+
         category_input, date_input = st.columns([3, 1])
         category_map = {c.category_name: c for c in categories}
         selected_categories = category_input.multiselect("Select Categories", list(category_map.keys()), accept_new_options=False,)

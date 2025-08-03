@@ -18,11 +18,14 @@ try:
                 WHEN a.was_read = 0 THEN "False"
                 ELSE "True"
             END as was_read,
+            r.interest_rating,
+            r.quality_rating,
             a.link
         FROM Articles a
         INNER JOIN ArticleCategories ac ON a.article_id = ac.article_id
         INNER JOIN Categories c ON ac.category_id = c.category_id
-        GROUP BY a.article_id, a.title, a.was_read, a.date_added, a.link
+        INNER JOIN Reviews r ON a.article_id = r.article_id
+        GROUP BY a.article_id, a.title, a.was_read, a.date_added, r.interest_rating, r.quality_rating,  a.link
     """, sqliteConnection)
 
     st.write("Combined Data")
