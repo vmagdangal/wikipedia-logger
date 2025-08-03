@@ -2,11 +2,12 @@ import streamlit as st  # type: ignore
 import sqlite3
 import pandas as pd # type: ignore
 
-st.set_page_config(page_title="Article Library", page_icon="📊")
-st.markdown(f"**Dataframes**")
+st.set_page_config(page_title="Dataframes", page_icon="🗃️")
+DB_PATH = './database/articles.db'
 
+st.title("Dataframes")
 try:
-    sqliteConnection = sqlite3.connect('./database/articles.db')
+    sqliteConnection = sqlite3.connect(DB_PATH)
 
     df_article_combo = pd.read_sql_query("""
         SELECT 

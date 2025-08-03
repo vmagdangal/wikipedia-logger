@@ -1,8 +1,10 @@
 import sqlite3
 
+DB_PATH = './database/articles.db'
+
 try:
     # Connect to SQLite Database and create a cursor
-    sqliteConnection = sqlite3.connect('./database/articles.db')
+    sqliteConnection = sqlite3.connect(DB_PATH)
     cursor = sqliteConnection.cursor()
     print('Resetting Database')
 

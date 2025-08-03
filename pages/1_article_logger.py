@@ -7,7 +7,8 @@ import datetime
 from streamlit_star_rating import st_star_rating # type: ignore
 
 sys.stdout.reconfigure(encoding='utf-8')
-st.set_page_config(page_title="Wikipedia Logger", page_icon="📊")
+st.set_page_config(page_title="Wikipedia Logger", page_icon="✍️")
+DB_PATH = './database/articles.db'
 
 class Article:
   def __init__(self, title, lang, data, link, date_read, interest_rating, quality_rating):
@@ -49,7 +50,7 @@ def grab_article(url):
 def grab_categories():
     categories = []
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
 
         df = pd.read_sql_query("""
             SELECT *
@@ -72,7 +73,7 @@ def grab_categories():
 
 def add_article(button, wasRead: bool, article: Article, categories):
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
         cursor = sqliteConnection.cursor()
 
         cursor.execute("""

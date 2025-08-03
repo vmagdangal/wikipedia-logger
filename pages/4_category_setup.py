@@ -6,7 +6,8 @@ import pandas as pd # type: ignore
 from datetime import datetime
 
 sys.stdout.reconfigure(encoding='utf-8')
-st.set_page_config(page_title="Category Setup", page_icon="📊")
+st.set_page_config(page_title="Category Setup", page_icon="🔧")
+DB_PATH = './database/articles.db'
 
 class Article:
   def __init__(self, title, lang, data, link):
@@ -28,7 +29,7 @@ def parse_lang(url):
 
 def add_category(title):
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
         cursor = sqliteConnection.cursor()
 
         cursor.execute("""
@@ -52,7 +53,7 @@ def add_category(title):
 
 def delete_category(category_id):
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
         sqliteConnection.execute("PRAGMA foreign_keys=ON;")
         cursor = sqliteConnection.cursor()
         cursor.execute("""
@@ -91,7 +92,7 @@ if category_name:
             st.error(f"Could not add \"{category_name}\". Category already exists.", icon="⚠️")
 
 try:
-    sqliteConnection = sqlite3.connect('./database/articles.db')
+    sqliteConnection = sqlite3.connect(DB_PATH)
 
     df = pd.read_sql_query("""
         SELECT *

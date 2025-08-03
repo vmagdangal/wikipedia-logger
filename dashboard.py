@@ -7,11 +7,12 @@ import wikipedia # type: ignore
 
 sys.stdout.reconfigure(encoding='utf-8')
 st.set_page_config(page_title="Dashboard", page_icon="📊")
+DB_PATH = './database/articles.db'
 
 st.title("Dashboard")
 
 try:
-    sqliteConnection = sqlite3.connect('./database/articles.db')
+    sqliteConnection = sqlite3.connect(DB_PATH)
 
     df_articles = pd.read_sql_query("""
         SELECT *

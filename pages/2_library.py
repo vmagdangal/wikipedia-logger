@@ -4,7 +4,8 @@ import pandas as pd # type: ignore
 import wikipedia #type: ignore
 from streamlit_star_rating import st_star_rating # type: ignore
 
-st.set_page_config(page_title="Article Library", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Article Library", page_icon="📚", layout="wide")
+DB_PATH = './database/articles.db'
 MAX_SUMMARY_LENGTH = 350
 WIDTH_SORT = [4, 2, 1]
 WIDTH_FILTER = [4, 1, 1]
@@ -43,6 +44,27 @@ def switch_read(was_read, article_id):
         sqliteConnection = sqlite3.connect('./database/articles.db')
         cursor = sqliteConnection.cursor()
         cursor.execute("""
+            UPDATE Reviews
+            SET interest_rating = ?, quality_rating = ?
+            WHERE article_id = ?
+        """, (new_interest, new_quality, article_id))
+        sqliteConnection.commit()
+        cursor.close()
+        st.rerun()
+        return True
+
+    except sqlite3.Error as error:
+        return False
+    
+    finally:
+        if sqliteConnection:
+            sqliteConnection.close()
+
+def switch_read(was_read, article_id):
+    try:
+        sqliteConnection = sqlite3.connect(DB_PATH)
+        cursor = sqliteConnection.cursor()
+        cursor.execute("""
             UPDATE Articles
             SET was_read = ?
             WHERE article_id = ?
@@ -61,7 +83,7 @@ def switch_read(was_read, article_id):
 
 def delete_article(article_id):
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
         sqliteConnection.execute("PRAGMA foreign_keys=ON;")
         cursor = sqliteConnection.cursor()
         cursor.execute("""
@@ -83,7 +105,7 @@ def delete_article(article_id):
 
 def update_categories(article_id, categories):
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
         sqliteConnection.execute("PRAGMA foreign_keys=ON;")
         cursor = sqliteConnection.cursor()
 
@@ -110,7 +132,7 @@ def update_categories(article_id, categories):
 
 def update_date(article_id, new_date):
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
         sqliteConnection.execute("PRAGMA foreign_keys=ON;")
         cursor = sqliteConnection.cursor()
 
@@ -136,7 +158,7 @@ def update_date(article_id, new_date):
 def grab_categories():
     categories = []
     try:
-        sqliteConnection = sqlite3.connect('./database/articles.db')
+        sqliteConnection = sqlite3.connect(DB_PATH)
 
         df = pd.read_sql_query("""
             SELECT *
@@ -157,7 +179,7 @@ def grab_categories():
             return categories
 
 try:
-    sqliteConnection = sqlite3.connect('./database/articles.db')
+    sqliteConnection = sqlite3.connect(DB_PATH)
 
     category_map = {c.category_name: c for c in grab_categories()}
     df = pd.read_sql_query("""
