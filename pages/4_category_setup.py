@@ -127,6 +127,12 @@ try:
         ORDER BY category_name
     """, sqliteConnection)
 
+    article_category_df = pd.read_sql_query("""
+        SELECT category_id, COUNT(article_id) AS num_articles
+        FROM ArticleCategories
+        GROUP BY category_id
+    """, sqliteConnection)
+
     st.divider()
     st.markdown(f"**Categories**")
 
@@ -138,12 +144,18 @@ try:
                 if(index != 0):
                     st.divider()
                 title, rename_box, rename_confirm, delete = st.columns([2,1,1,1], vertical_alignment="bottom")
+                filtered = article_category_df.loc[article_category_df['category_id'] == row.category_id, 'num_articles']
+                if not filtered.empty:
+                    articles_in_category = filtered.iloc[0]
+                else:
+                    articles_in_category = 0
                 title.subheader(f"**{row.category_name}**")
                 category_rename = rename_box.text_input("Rename Category (50 char)", key=f"rename_{row.category_id}").strip()
                 if rename_confirm.button("Rename", icon="🔄", key=f"rename_confirm_{row.category_id}", disabled=len(category_rename) > 50):
                     rename_category(row.category_id, category_rename)
                 if delete.button("Delete Category", icon="🗑️", key=f"delete_{row.category_id}"):
                     delete_category(row.category_id)
+                delete.markdown(f"(Articles: {articles_in_category})")
 
             
 
